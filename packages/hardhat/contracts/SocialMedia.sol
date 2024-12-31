@@ -34,11 +34,6 @@ contract SocialMedia {
         _;
     }
 
-    modifier notPostCreator(uint256 postId) {
-        require(posts[postId].creator != msg.sender, "Cannot like own post");
-        _;
-    }
-
     /**
      * @dev Create a new post
      * @param content The content of the post
@@ -67,7 +62,7 @@ contract SocialMedia {
      * @dev Like or unlike a post
      * @param postId The ID of the post
      */
-    function toggleLike(uint256 postId) external validPostId(postId) notPostCreator(postId) {
+    function toggleLike(uint256 postId) external validPostId(postId) {
         bool hasLiked = postLikes[postId][msg.sender];
         
         if (hasLiked) {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useAccount, useReadContract, useWriteContract } from "wagmi";
+import { useAccount, useReadContract, useSimulateContract, useWriteContract } from "wagmi";
 import { Address } from "~~/components/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
@@ -19,6 +19,7 @@ export const PostCard = ({ post }: PostCardProps) => {
   const { data: socialMediaContract } = useDeployedContractInfo("SocialMedia");
   const { writeContract, isPending } = useWriteContract();
 
+  // Read like status
   const { data: hasLiked } = useReadContract({
     address: socialMediaContract?.address,
     abi: socialMediaContract?.abi,
@@ -28,16 +29,21 @@ export const PostCard = ({ post }: PostCardProps) => {
     enabled: Boolean(socialMediaContract && address),
   });
 
+  // Simulate contract write
+  const { data: simulateData } = useSimulateContract({
+    address: socialMediaContract?.address,
+    abi: socialMediaContract?.abi,
+    functionName: 'toggleLike',
+    args: [BigInt(post.id)],
+    account: address,
+    enabled: Boolean(socialMediaContract && address),
+  });
+
   const handleToggleLike = async () => {
-    if (!socialMediaContract) return;
+    if (!simulateData?.request) return;
 
     try {
-      await writeContract({
-        address: socialMediaContract.address,
-        abi: socialMediaContract.abi,
-        functionName: 'toggleLike',
-        args: [BigInt(post.id)],
-      });
+      await writeContract(simulateData.request);
     } catch (error) {
       console.error("Error toggling like:", error);
     }
@@ -56,7 +62,7 @@ export const PostCard = ({ post }: PostCardProps) => {
         <button
           className={`btn btn-sm ${hasLiked ? "btn-primary" : "btn-outline"}`}
           onClick={handleToggleLike}
-          disabled={!address || post.creator === address || isPending}
+          disabled={!address || isPending || !simulateData?.request}
         >
           {isPending ? (
             <span className="loading loading-spinner loading-xs"></span>
