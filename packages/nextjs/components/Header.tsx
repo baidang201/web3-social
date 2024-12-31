@@ -4,6 +4,7 @@ import React, { useCallback, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useAccount } from "wagmi";
 import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick } from "~~/hooks/scaffold-eth";
@@ -57,7 +58,10 @@ export const HeaderMenuLinks = () => {
  */
 export const Header = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { address } = useAccount();
   const burgerMenuRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+  
   useOutsideClick(
     burgerMenuRef,
     useCallback(() => setIsDrawerOpen(false), []),
@@ -84,7 +88,21 @@ export const Header = () => {
                 setIsDrawerOpen(false);
               }}
             >
-              <HeaderMenuLinks />
+              <li>
+                <Link href="/" className={`${pathname === "/" ? "bg-secondary" : ""}`}>
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link href="/social" className={`${pathname === "/social" ? "bg-secondary" : ""}`}>
+                  Social Media
+                </Link>
+              </li>
+              <li>
+                <Link href="/debug" className={`${pathname === "/debug" ? "bg-secondary" : ""}`}>
+                  Debug Contracts
+                </Link>
+              </li>
             </ul>
           )}
         </div>
@@ -98,7 +116,21 @@ export const Header = () => {
           </div>
         </Link>
         <ul className="hidden lg:flex lg:flex-nowrap menu menu-horizontal px-1 gap-2">
-          <HeaderMenuLinks />
+          <li>
+            <Link href="/" className={`${pathname === "/" ? "bg-secondary" : ""}`}>
+              Home
+            </Link>
+          </li>
+          <li>
+            <Link href="/social" className={`${pathname === "/social" ? "bg-secondary" : ""}`}>
+              Social Media
+            </Link>
+          </li>
+          <li>
+            <Link href="/debug" className={`${pathname === "/debug" ? "bg-secondary" : ""}`}>
+              Debug Contracts
+            </Link>
+          </li>
         </ul>
       </div>
       <div className="navbar-end flex-grow mr-4">
